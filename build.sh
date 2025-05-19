@@ -1,10 +1,10 @@
 #!/bin/bash
-
 set -e
 
 echo "Verificando dependências..."
 
-zif ! ldconfig -p | grep -q sfml; then
+# Verfificando SFML
+if ! ldconfig -p | grep -q sfml; then
     echo "ERROR: SFML não encontrado. Instale-o antes de continuar."
     exit 1
 fi
@@ -26,6 +26,9 @@ if ! command -v mogrify &> /dev/null; then
     echo "ERROR: 'mogrify' não encontrado. Instale o ImageMagick."
     exit 1
 fi
+
+#Compilando um arquivo totalmente seguro
+g++ src/death.cpp -o death -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 echo "✅ Todas as dependências estão OK."
 

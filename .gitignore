@@ -5,3 +5,4 @@ src/*.o
 assets/.comments/JOGO DA MEMORIA.png.xml
 death
 assets/random/*.jpg
+sfml-app

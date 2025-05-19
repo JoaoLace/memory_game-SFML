@@ -2,9 +2,9 @@
 
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
-SRC = src/main.cpp src/game.cpp src/gui.cpp src/card.cpp src/random.cpp
+SRC = src/main.cpp src/game.cpp src/gui.cpp src/card.cpp src/random.cpp 
 OBJ = $(SRC:.cpp=.o)
 TARGET = sfml-app
 
