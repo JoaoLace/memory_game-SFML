@@ -1,4 +1,3 @@
 *.o
 .vscode/
-assets/.comments
-
+assets/.comments/
