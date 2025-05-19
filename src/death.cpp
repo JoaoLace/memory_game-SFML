@@ -20,6 +20,7 @@ int main() {
 
     sf::Sound som;
     som.setBuffer(buffer);
+    som.setVolume(300);
     som.play();
 
     // Modo de vídeo da tela
@@ -32,7 +33,7 @@ int main() {
 
     // Imagem aleatória
     int imageIndex = rand() % 5 + 1;
-    std::string imagePath = "assets/hihi/" + std::to_string(imageIndex) + ".jpg";
+    std::string imagePath = "assets/hihi/4.jpg";
 
     sf::Texture texture;
     if (!texture.loadFromFile(imagePath)) {
