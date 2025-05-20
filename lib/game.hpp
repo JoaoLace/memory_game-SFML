@@ -6,72 +6,80 @@
 #include "random.hpp"
 #include <ctime>
 
-enum vez {jogador1, jogador2};
+enum vez { jogador1, jogador2 };
 
-// Definindo algumas merdas
-const sf::VideoMode windowSize = sf::VideoMode(800,600);
-const std::string title = "Jogo da Memoria - Habib";    
-
-
+// Constantes globais
+const sf::VideoMode windowSize = sf::VideoMode(800, 600);
+const std::string title = "Jogo da Memoria - Habib";
 
 class game {
-    public:
-        game();
-        ~game();
+public:
+    game();
+    ~game();
 
-        void run();
+    void run(); // Loop principal
 
-    private:
-        // variaveis
-        sf::RenderWindow *window;
-        bool running;
-        bool started;
-        int tema; 
-        sf::Font font;
-        gui initialScreen;
-        std::vector<card> cards;
-        sf::Sprite backgroundPelado;
-        sf::Texture backgroundPeladoTexture;
-        std::vector<sf::Text> placar; 
-        int j1Pontos,j2Pontos,jAtual,jPontos;
-        sf::Text endText;
-        bool gameOver = false;
-        sf::Clock speedrunClock;
-        sf::Text speedrunText;
-        bool isSpeedrunMode;
+private:
+    // Janela e estado do jogo
+    sf::RenderWindow* window;
+    bool running;
+    bool started;
+    bool gameOver = false;
+    bool isSpeedrunMode;
 
+    // Recursos visuais e fontes
+    sf::Font font;
+    sf::Sprite backgroundPelado;
+    sf::Texture backgroundPeladoTexture;
 
-        // Metodos
-        void init();
-        void initWindow();
-        void initFont();
-        void initVariables();
-        void initCards();
-        void initPlacar();
+    // Interface e lógica inicial
+    gui initialScreen;
+    int tema;
+    std::string temaFunc();
 
-        void update();
-        void updateEvents();
-        void updatePlacar();
+    // Cartas
+    std::vector<card> cards;
+    card* firstFlipped = nullptr;
+    card* secondFlipped = nullptr;
+    sf::Clock flipClock;
+    bool waitingToUnflip = false;
 
-        void render();
-        void renderCards();
-        void renderPlacar();
+    // Placar e pontuação
+    std::vector<sf::Text> placar;
+    int j1Pontos, j2Pontos;
+    int jAtual;     // 0 ou 1
+    int jPontos;    // pontos do jogador caso esteja em modo de speedrun
+    sf::Text endText;
 
-        void setTema(int novoTema);
-        void startGame();
-        void endGame();
-        void morte();
+    // Speedrun
+    sf::Clock speedrunClock;
+    sf::Text speedrunText;
 
-        void handleCardClick();
-        void checkForMatch();
-        bool checkGameOver();
+    // Inicialização
+    void init();
+    void initWindow();
+    void initFont();
+    void initVariables();
+    void initCards();
+    void initPlacar();
 
-        card* firstFlipped = nullptr;
-        card* secondFlipped = nullptr;
-        sf::Clock flipClock;
-        bool waitingToUnflip = false;
+    // Atualização
+    void update();
+    void updateEvents();
+    void updatePlacar();
 
+    // Renderização
+    void render();
+    void renderCards();
+    void renderPlacar();
 
-        std::string temaFunc();
+    // Lógica do jogo
+    void setTema(int novoTema);
+    void startGame();
+    void endGame();
+    void morte(); // kkkkkkkkkkkk
+
+    void handleCardClick();
+    void checkForMatch();
+    bool checkGameOver();
 };
-

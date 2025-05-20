@@ -32,8 +32,7 @@ void game::initCards() {
     switch (tema)
     {
         case memes:
-            for (char x : folder) folderLower += tolower(x);
-            filePath += folderLower + "/";
+            filePath += "memes/";
             break;
         case aleatorio:
             strTema += my_random::tema();
@@ -49,6 +48,7 @@ void game::initCards() {
         case speedrun:
             std::cout << "Seu destino foi decretado...";
             filePath += "memes/";
+            break;
         default:
             break;
     }
@@ -150,7 +150,9 @@ void game::initVariables(){
     j2Pontos = 0;
     isSpeedrunMode = false;
 
-    backgroundPeladoTexture.loadFromFile("assets/backgroundPelado.png");
+    if (!backgroundPeladoTexture.loadFromFile("assets/backgroundPelado.png")) {
+        std::cerr << "Erro ao carregar o fundo 'backgroundPelado.png'\n";
+    }
     backgroundPelado.setTexture(backgroundPeladoTexture);
 
 
@@ -291,8 +293,10 @@ std::string game::temaFunc() {
 
 
 void game::setTema(int novoTema){
-    tema = static_cast<int>(novoTema); 
+    if (novoTema >= temas::nulo && novoTema <= temas::speedrun)
+        tema = static_cast<temas>(novoTema);
 }
+
 
 void game::startGame(){
     started = true;

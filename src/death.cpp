@@ -8,6 +8,8 @@
 
 std::string titles[5] = {"MORTE", "FUTILIDADE", "ABANDONO", "DOR", "AGONIA"};
 
+// NAO LEIA, VAI ESTRAGAR A SURPRESA
+
 int main() {
     srand(static_cast<unsigned>(time(0)));
 
@@ -31,8 +33,7 @@ int main() {
     sf::RenderWindow window(desktop, titles[titleIndex], sf::Style::Fullscreen);
     window.setFramerateLimit(60);
 
-    // Imagem aleatória
-    int imageIndex = rand() % 5 + 1;
+    // Imagem 
     std::string imagePath = "assets/hihi/4.jpg";
 
     sf::Texture texture;

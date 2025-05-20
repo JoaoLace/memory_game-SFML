@@ -1,5 +1,6 @@
 #include "../lib/random.hpp"
 
+// Mesma coisa do random.hpp...
 
 void my_random::clear(){
     std::string path = "assets/random"; 

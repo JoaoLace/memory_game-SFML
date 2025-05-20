@@ -1,5 +1,6 @@
 #include "../lib/gui.hpp"
 
+// Testa se o mouse esta sobre algum texto
 bool isMouseOverText(const sf::Text& text, const sf::RenderWindow& window) {
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
@@ -15,7 +16,7 @@ int gui::testText(sf::RenderWindow &window){
     return -1; 
 }
 
-
+// Incializa todos os textos e background
 void gui::init(const sf::Font& font){
     texts.push_back(createText(font, 40, {200,40},sf::Color::Blue,""));
     texts.push_back(createText(font, 25, {280,100}, sf::Color::Blue,"Escolha um tema:"));
@@ -41,6 +42,7 @@ void gui::init(const sf::Font& font){
 
 }
 
+// RENDER
 void gui::render(sf::RenderTarget &window){
     window.draw(background);
 
@@ -49,6 +51,7 @@ void gui::render(sf::RenderTarget &window){
     }
 }
 
+// Testa se o user clicou em algum texto
 int gui::testClick(sf::RenderWindow &window, sf::Event event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Button::Left) {
@@ -67,10 +70,7 @@ int gui::testClick(sf::RenderWindow &window, sf::Event event) {
     return temas::nulo;  
 }
 
-
-
-
-
+// Se o user estiver com o mouse sob um texto, fica branco, senão fica azul
 void gui::update(sf::RenderWindow &window) {
     updateColor(window);
 }
@@ -82,6 +82,7 @@ void gui::updateColor(sf::RenderWindow &window){
     }
 }
 
+// Pra facilitar a criação dos textos
 sf::Text createText(const sf::Font& font, float size, sf::Vector2f pos, sf::Color color, std::string text){
     sf::Text temp;   
     temp.setFont(font);

@@ -1,44 +1,88 @@
-## Memory Game
+## Jogo da Memória para o Eduardo Habib!!
 
-This is a school project. Be gentle — I'm learning as I go!
+### Grupo:
+- Arthus Lopes Fernandes
+- Gustavo Araújo Menezes Castro
+- João Paulo Lacerda Leão de Oliveira
 
-### Game Modes
+### Execução (vai dar trabalho)
 
-* **Normal Mode (Meme)**
-  Classic memory game, but with Brazilian memes to make it more fun.
+1. Clone o repositório.
+2. De permissão para ```build.sh``` com:
 
-* **Random Mode (Aleatório)**
-  Randomly selects a theme from `assets/temas.txt` using `random.cpp`.
-  Then, `feeder.py` grabs images for that theme and places them in `assets/random`.
+```bash
+chmod +x build.sh
+```
 
-* **Choose Your Theme (Escolha)**
-  Same logic as Random Mode, but you pick the theme yourself.
+3. O arquivo vai te informar o que você deve instalar caso você não tenha as dependencies necessárias. Mas, de qualquer forma, aqui estão elas:
 
-* **Speedrun Mode**
-  Tracks your time and gives you a little surprise if you finish under 10 seconds.
+- ```GCC/G++``` para compilar os arquivos cpp;
+- ```Makefile``` pra compilar o projeto;
+- ```SFML```  (biblioteca gráfica);
+- ```Pyhton3``` para rodar um arquivo .py necessário pra algumas funções do jogo;
+- Bibliotecas ```requests``` e ```duckduckgo_search``` (serão instaladas automaticamente);
+- ```ImageMagick```, aplicação do Linux para redimensionar imagens por comandos do cmd.
+  
 
-### System Requirements
+4. Caso você não tenha as dependências necessárias, aqui vai um mini tutorial: (não sei qual distro tu usa, então vou falar como baixa nas mais famosas)
 
-Tested on **Fedora Linux**, but it should work on any modern Linux distro.
+- **Fedora / RHEL / CentOS**
 
-### Dependencies
+```bash
+sudo dnf install gcc-c++ make SFML SFML-devel python3 ImageMagick
+```
 
-#### C++
 
-Well... it's a C++ project.
+- Debian / Ubuntu / Linux Mint / Pop!_OS
 
-#### SFML
+``` shell
+sudo apt update
+sudo apt install g++ make libsfml-dev python3 python3-pip imagemagic
+```
 
-Handles graphics and window rendering.
+- Arch Linux / Manjaro / EndeavourOS
+```bash
+sudo pacman -Syu
+sudo pacman -S gcc make sfml python python-pip imagemagick
+```
 
-#### Python 3
+5. Agora, com todas as dependências instaladas, ou você da ```./build.sh``` ou ```make``` + ```./sfml-app``` 
 
-Used to run `feeder.py`:
+### Ferramentas 
 
-* `requests` and `duckduckgo_search` for fetching images online.
+Bom, eu já meio que falei quais são kk, mas aqui está denovo:
 
-#### ImageMagick
+- ```GCC/G++``` para compilar os arquivos cpp;
+- ```Makefile``` pra compilar o projeto;
+- ```SFML```  (biblioteca gráfica);
+- ```Pyhton3``` para rodar um arquivo .py necessário pra algumas funções do jogo;
+- Bibliotecas ```requests``` e ```duckduckgo_search``` (serão instaladas automaticamente);
+- ```ImageMagick```, aplicação do Linux para redimensionar imagens por comandos do cmd.
 
-Used to resize images to `100x100px` via the `mogrify` command.
+### Funcionalidades
 
+É um jogo da memoria padrão, porém com algumas coisas especiais…
+Quando o programa rodar, você poderá escolher entre 4 opções:
+- Memes (carrega o tema de memes);
+- Aleatório (carrega um tema aleatório);
+- Escolha (abre um prompt no cmd pra você digitar o tema que quiser);
+- Speedrun (usa o tema de memes, mas também registra o tempo que você está demorando pra finalizar o jogo).
+
+### Estrutura
+
+TEM ARQUIVO COM BORRA.
+
+Sendo sincero, eu me empolguei um pouco mais do que deveria, mas enfim. As pasta são bastante auto explicativas, mas aqui está um descrição delas:
+
+- assets/ 
+	Carrega todos os arquivos necessários pra mostrar a tela pro jogador, como background, fonte, imagens para os temas etc.
+
+- lib/
+	Pasta de biblioteca com os arquivos .hpp e definições de classes, eu faço dessa forma pra não precisar me preocupar com a ordem em que as funções são definidas.
+
+- src/
+	Todos os arquivos .cpp necessários pra rodar o jogo.
+
+- feeder.py
+	Usa uma biblioteca para baixar imagens da internet.
 

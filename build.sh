@@ -3,6 +3,7 @@ set -e
 
 echo "Verificando dependências..."
 
+
 # Verfificando SFML
 if ! ldconfig -p | grep -q sfml; then
     echo "ERROR: SFML não encontrado. Instale-o antes de continuar."
@@ -38,4 +39,4 @@ make
 echo "Rodando o jogo..."
 ./sfml-app
 
-echo "🚀 Jogo compilado com sucesso em ./sfml-app"
+echo "Jogo compilado com sucesso em ./sfml-app"
