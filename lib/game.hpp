@@ -4,7 +4,9 @@
 #include "gui.hpp"
 #include "card.hpp"
 #include "random.hpp"
+#include "servidor.hpp"
 #include <ctime>
+#include <functional>
 
 enum vez { jogador1, jogador2 };
 
@@ -26,6 +28,11 @@ private:
     bool started;
     bool gameOver = false;
     bool isSpeedrunMode;
+    bool isOnlineMode = false;
+
+	// servidor / websocket
+	servidor* server; 	
+    sf::Vector2f index_to_position(int x, int y);
 
     // Recursos visuais e fontes
     sf::Font font;
@@ -55,6 +62,11 @@ private:
     sf::Clock speedrunClock;
     sf::Text speedrunText;
 
+    // Online mode
+    sf::Text onlineStatusText;
+    bool waitingForPlayers = false;
+    int connectedPlayers = 0;
+
     // Inicialização
     void init();
     void initWindow();
@@ -62,16 +74,19 @@ private:
     void initVariables();
     void initCards();
     void initPlacar();
+    void initOnlineMode();
 
     // Atualização
     void update();
     void updateEvents();
     void updatePlacar();
+    void updateServidor();
 
     // Renderização
     void render();
     void renderCards();
     void renderPlacar();
+    void renderOnlineStatus();
 
     // Lógica do jogo
     void setTema(int novoTema);
@@ -82,4 +97,8 @@ private:
     void handleCardClick();
     void checkForMatch();
     bool checkGameOver();
+
+    // WebSocket callbacks
+    void onCardReveal(int x, int y);
+    std::string getGameState();
 };

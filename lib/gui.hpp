@@ -1,8 +1,8 @@
 #pragma once
 
 // Enums para indexar textos e definir temas
-enum textos { titulo, desc, op1, op2, op3, op4 };
-enum temas { nulo, memes, aleatorio, escolha, speedrun };
+enum textos { titulo, desc, op1, op2, op3, op4, op5 };
+enum temas { nulo, memes, aleatorio, escolha, speedrun, online };
 
 // Includes
 #include <SFML/Graphics.hpp>

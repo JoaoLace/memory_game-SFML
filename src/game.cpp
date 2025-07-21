@@ -1,4 +1,6 @@
 #include "../lib/game.hpp"
+#include <thread>
+#include <fstream>
 
 // construtor
 game::game(){
@@ -7,6 +9,9 @@ game::game(){
 
 // destrutor
 game::~game(){
+    if (server) {
+        delete server;
+    }
     delete window;
 }
 
@@ -18,6 +23,7 @@ void game::init(){
     initCards();
     initPlacar();
     initialScreen.init(font);
+    initOnlineMode();
 }
 
 void game::initCards() {
@@ -49,6 +55,9 @@ void game::initCards() {
             std::cout << "Seu destino foi decretado...";
             filePath += "memes/";
             break;
+		case online:
+			filePath += "memes/";
+			break;
         default:
             break;
     }
@@ -83,7 +92,11 @@ void game::initCards() {
 
     // Tamanho total do grid
     float totalWidth = cols * cardWidth + (cols - 1) * padding;
+    // 5 * 100 + 30 = 530
+    
+    
     float totalHeight = rows * cardHeight + (rows - 1) * padding;
+
 
     // Centraliza horizontalmente baseado na largura da janela
     float xStart = (window->getSize().x - totalWidth) / 2.0f;
@@ -101,6 +114,8 @@ void game::initCards() {
             col = 0;
             row++;
         }
+
+       std::cout << "Carta " << i << " -> " << cards[i].getSprite().getPosition().x << "x " << cards[i].getSprite().getPosition().y << " y\n";
 
         // Ajusta escala das texturas
         // if (cards[i].getFrontTexture() != nullptr) {
@@ -164,7 +179,6 @@ void game::initVariables(){
     float scaleY = static_cast<float>(windowSize.y) / textureSize.y;
 
     backgroundPelado.setScale(scaleX, scaleY);
-
     backgroundPelado.setPosition(0, 0);
 }
 
@@ -188,11 +202,31 @@ void game::update(){
         }
         updatePlacar();
         checkForMatch();
-        handleCardClick();
+        if (tema != temas::online) handleCardClick();
         if (checkGameOver()) endGame();
+        updateServidor();
     }
 }
  
+void game::updateServidor(){
+    if (tema != temas::online) return;
+
+    // Atualiza o status dos jogadores conectados
+    // Em uma implementação real, isso viria do servidor
+    static int lastConnectedPlayers = 0;
+    
+    if (server && isOnlineMode) {
+        // Por enquanto, mantém 0 jogadores até que jogadores reais se conectem
+        // Em uma implementação completa, isso seria atualizado pelo servidor
+        connectedPlayers = 0;
+        waitingForPlayers = true;
+        
+        if (connectedPlayers != lastConnectedPlayers) {
+            std::cout << "Jogadores conectados: " << connectedPlayers << "/2" << std::endl;
+            lastConnectedPlayers = connectedPlayers;
+        }
+    }
+}
 
 void game::updateEvents() {
     sf::Event event;
@@ -253,6 +287,7 @@ void game::render(){
         if (!isSpeedrunMode) renderPlacar();
         if (isSpeedrunMode) window->draw(speedrunText);
         if (gameOver) window->draw(endText);
+        if (isOnlineMode) renderOnlineStatus();
     }
     window->display();
 }
@@ -286,6 +321,8 @@ std::string game::temaFunc() {
             return "speedrun";
         case temas::escolha:
             return "escolha";
+        case temas::online:
+            return "online";
         default:
             return "";
     }
@@ -293,7 +330,7 @@ std::string game::temaFunc() {
 
 
 void game::setTema(int novoTema){
-    if (novoTema >= temas::nulo && novoTema <= temas::speedrun)
+    if (novoTema >= temas::nulo && novoTema <= temas::online)
         tema = static_cast<temas>(novoTema);
 }
 
@@ -307,6 +344,10 @@ void game::startGame(){
         speedrunClock.restart();
     } else {
         isSpeedrunMode = false;
+    }
+    
+    if (tema == temas::online && !isOnlineMode) {
+        initOnlineMode();
     }
 }
 
@@ -387,4 +428,134 @@ bool game::checkGameOver(){
 void game::morte(){
     std::string com = "./src/morte.sh";
     system(com.c_str());
+}
+
+sf::Vector2f game::index_to_position(int x, int y){
+    int pos_x = 130; //magic numbers go brrrrrrrr
+    int pos_y = 100;
+
+    pos_x += 110 * (x-1); // magic numbers math go brrrrrrrr
+    pos_y += 110 * (y-1);
+
+
+    return sf::Vector2f(pos_x, pos_y);
+}
+
+// WebSocket integration methods
+void game::initOnlineMode() {
+    if (tema == temas::online) {
+        isOnlineMode = true;
+        
+        // Verifica se a porta 9003 está livre
+        bool porta_livre = true;
+        try {
+            std::ifstream netstat_output;
+            netstat_output.open("/proc/net/tcp");
+            std::string line;
+            while (std::getline(netstat_output, line)) {
+                if (line.find(":233B") != std::string::npos) { // 9003 em hex
+                    porta_livre = false;
+                    break;
+                }
+            }
+        } catch (...) {
+            // Se não conseguir verificar, assume que está livre
+        }
+        
+        if (!porta_livre) {
+            std::cout << "⚠️  Porta 9003 está em uso. Aguarde..." << std::endl;
+            // Aguarda um pouco e tenta novamente
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
+        
+        server = new servidor();
+        
+        // Set up callbacks
+        server->setGameCallback([this](int x, int y) {
+            this->onCardReveal(x, y);
+        });
+        
+        server->setGameStateCallback([this]() {
+            return this->getGameState();
+        });
+        
+        // Initialize online status text
+        onlineStatusText.setFont(font);
+        onlineStatusText.setCharacterSize(16);
+        onlineStatusText.setFillColor(sf::Color::Green);
+        onlineStatusText.setString("Aguardando jogadores...");
+        onlineStatusText.setPosition(10, 10);
+        
+        waitingForPlayers = true;
+        connectedPlayers = 0;
+        
+        // Start server in a separate thread
+        std::thread serverThread([this]() {
+            try {
+                server->run();
+            } catch (const std::exception& e) {
+                std::cerr << "Erro no servidor WebSocket: " << e.what() << std::endl;
+            }
+        });
+        serverThread.detach();
+        
+        std::cout << "Servidor WebSocket iniciado na porta 9003..." << std::endl;
+    } else {
+        isOnlineMode = false;
+        server = nullptr;
+    }
+}
+
+void game::onCardReveal(int x, int y) {
+    if (!isOnlineMode || !started) return;
+    
+    // Find the card at the specified position
+    int cardIndex = y * 5 + x; // 5 columns, 4 rows
+    if (cardIndex >= 0 && cardIndex < cards.size()) {
+        card& c = cards[cardIndex];
+        
+        if (!c.getIsFlipped() && !c.getIsMatched()) {
+            c.flip();
+            
+            if (!firstFlipped) {
+                firstFlipped = &c;
+            } else if (!secondFlipped && &c != firstFlipped) {
+                secondFlipped = &c;
+                flipClock.restart();
+                waitingToUnflip = true;
+            }
+        }
+    }
+}
+
+std::string game::getGameState() {
+    std::string state = "SCORE:" + std::to_string(j1Pontos) + "," + std::to_string(j2Pontos);
+    state += "|TURN:" + std::to_string(jAtual);
+    state += "|MATCHES:" + std::to_string(j1Pontos + j2Pontos);
+    state += "|GAMEOVER:" + std::to_string(gameOver ? 1 : 0);
+    
+    // Add card states
+    state += "|CARDS:";
+    for (size_t i = 0; i < cards.size(); i++) {
+        state += std::to_string(i) + "," + std::to_string(cards[i].getId()) + "," + 
+                 std::to_string(cards[i].getIsFlipped() ? 1 : 0) + "," +
+                 std::to_string(cards[i].getIsMatched() ? 1 : 0);
+        if (i < cards.size() - 1) state += ";";
+    }
+    
+    return state;
+}
+
+void game::renderOnlineStatus() {
+    if (isOnlineMode) {
+        std::string status = "Online - Jogadores: " + std::to_string(connectedPlayers) + "/2";
+        if (waitingForPlayers) {
+            status += " (Aguardando...)";
+        } else if (started) {
+            status += " (Jogando)";
+        }
+        
+        onlineStatusText.setString(status);
+        window->draw(onlineStatusText);
+    }
 }

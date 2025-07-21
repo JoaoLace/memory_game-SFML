@@ -8,7 +8,7 @@ bool isMouseOverText(const sf::Text& text, const sf::RenderWindow& window) {
 }
 
 int gui::testText(sf::RenderWindow &window){
-    for (int i = op1; i <= op4; i++){ 
+    for (int i = op1; i <= op5; i++){ 
         if (isMouseOverText(texts.at(i), window)) {
             return i;
         }
@@ -24,6 +24,9 @@ void gui::init(const sf::Font& font){
     texts.push_back(createText(font, 25, {330, 210}, sf::Color::Blue, "Aleatorio"));
     texts.push_back(createText(font, 25, {330, 265}, sf::Color::Blue, "Escolha"));
     texts.push_back(createText(font, 25, {330, 320}, sf::Color::Blue, "Speedrun"));
+    texts.push_back(createText(font, 25, {330, 375}, sf::Color::Blue, "Online"));
+	
+
 
     backgroundTexture.loadFromFile("assets/background.png");
     background.setTexture(backgroundTexture);
@@ -64,6 +67,7 @@ int gui::testClick(sf::RenderWindow &window, sf::Event event) {
                 if (str == "Aleatorio") return temas::aleatorio;
                 if (str == "Escolha")  return temas::escolha;
                 if (str == "Speedrun") return temas::speedrun;
+                if (str == "Online") return temas::online;
             }
         }
     }
@@ -78,7 +82,7 @@ void gui::update(sf::RenderWindow &window) {
 void gui::updateColor(sf::RenderWindow &window){
     if (testText(window)!= -1) texts.at(testText(window)).setFillColor(sf::Color::White);
     else{
-        for (int i = op1; i < op3 + 1; i++) texts.at(i).setFillColor(sf::Color::Blue);
+        for (int i = op1; i < op4 + 2; i++) texts.at(i).setFillColor(sf::Color::Blue);
     }
 }
 
