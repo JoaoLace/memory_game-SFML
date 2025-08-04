@@ -1,18 +1,19 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Ilib
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lboost_system -pthread
+CXXFLAGS = -std=c++17 -Wall -O2 -Ilib
+LIBS = -lboost_system -pthread
 
-SRC = src/main.cpp src/game.cpp src/gui.cpp src/card.cpp src/random.cpp src/servidor.cpp
-OBJ = $(SRC:.cpp=.o)
-TARGET = sfml-app
+TARGET = memory_game
+SOURCE = memory_game.cpp
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ) $(LDFLAGS)
-
-src/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(SOURCE)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SOURCE) $(LIBS)
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run 

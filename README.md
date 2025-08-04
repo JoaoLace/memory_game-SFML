@@ -1,88 +1,142 @@
-## Jogo da Memória para o Eduardo Habib!!
+# Jogo da Memória em Rede - README
 
-### Grupo:
-- Arthus Lopes Fernandes
-- Gustavo Araújo Menezes Castro
-- João Paulo Lacerda Leão de Oliveira
+## Grupo
 
-### Execução (vai dar trabalho)
+* Arthus Lopes Fernandes
+* Gustavo Araújo Menezes Castro
+* João Paulo Lacerda Leão de Oliveira
 
-1. Clone o repositório.
-2. De permissão para ```build.sh``` com:
+## Instruções de Execução
+
+### 1. Clone o repositório
+
+```bash
+git clone <url-do-repositorio>
+cd <nome-da-pasta>
+```
+
+### 2. Dê permissão de execução ao script de build
 
 ```bash
 chmod +x build.sh
 ```
 
-3. O arquivo vai te informar o que você deve instalar caso você não tenha as dependencies necessárias. Mas, de qualquer forma, aqui estão elas:
+### 3. Instale as dependências
 
-- ```GCC/G++``` para compilar os arquivos cpp;
-- ```Makefile``` pra compilar o projeto;
-- ```SFML```  (biblioteca gráfica);
-- ```Pyhton3``` para rodar um arquivo .py necessário pra algumas funções do jogo;
-- Bibliotecas ```requests``` e ```duckduckgo_search``` (serão instaladas automaticamente);
-- ```ImageMagick```, aplicação do Linux para redimensionar imagens por comandos do cmd.
-  
-
-4. Caso você não tenha as dependências necessárias, aqui vai um mini tutorial: (não sei qual distro tu usa, então vou falar como baixa nas mais famosas)
-
-- **Fedora / RHEL / CentOS**
+#### Fedora / RHEL / CentOS
 
 ```bash
 sudo dnf install gcc-c++ make SFML SFML-devel python3 ImageMagick
 ```
 
+#### Debian / Ubuntu / Linux Mint / Pop!\_OS
 
-- Debian / Ubuntu / Linux Mint / Pop!_OS
-
-``` shell
+```bash
 sudo apt update
-sudo apt install g++ make libsfml-dev python3 python3-pip imagemagic
+sudo apt install g++ make libsfml-dev python3 python3-pip imagemagick
 ```
 
-- Arch Linux / Manjaro / EndeavourOS
+#### Arch Linux / Manjaro / EndeavourOS
+
 ```bash
 sudo pacman -Syu
 sudo pacman -S gcc make sfml python python-pip imagemagick
 ```
 
-5. Agora, com todas as dependências instaladas, ou você da ```./build.sh``` ou ```make``` + ```./sfml-app``` 
+> As bibliotecas Python `requests` e `duckduckgo_search` serão instaladas automaticamente.
 
-### Ferramentas 
+### 4. Compile o projeto
 
-Bom, eu já meio que falei quais são kk, mas aqui está denovo:
+```bash
+make -f 
+```
 
-- ```GCC/G++``` para compilar os arquivos cpp;
-- ```Makefile``` pra compilar o projeto;
-- ```SFML```  (biblioteca gráfica);
-- ```Pyhton3``` para rodar um arquivo .py necessário pra algumas funções do jogo;
-- Bibliotecas ```requests``` e ```duckduckgo_search``` (serão instaladas automaticamente);
-- ```ImageMagick```, aplicação do Linux para redimensionar imagens por comandos do cmd.
+### 5. Execute o servidor
 
-### Funcionalidades
+```bash
+./memory_server
+```
 
-É um jogo da memoria padrão, porém com algumas coisas especiais…
-Quando o programa rodar, você poderá escolher entre 4 opções:
-- Memes (carrega o tema de memes);
-- Aleatório (carrega um tema aleatório);
-- Escolha (abre um prompt no cmd pra você digitar o tema que quiser);
-- Speedrun (usa o tema de memes, mas também registra o tempo que você está demorando pra finalizar o jogo).
+### 6. Conecte ao servidor com o cliente WebSocket
 
-### Estrutura
+```bash
+wscat -c ws://localhost:9003
+```
 
-TEM ARQUIVO COM BORRA.
+## 📃 Protocolo de Aplicação
 
-Sendo sincero, eu me empolguei um pouco mais do que deveria, mas enfim. As pasta são bastante auto explicativas, mas aqui está um descrição delas:
+A comunicação entre servidor e clientes é feita via WebSockets. O protocolo é textual e baseado em comandos simples:
 
-- assets/ 
-	Carrega todos os arquivos necessários pra mostrar a tela pro jogador, como background, fonte, imagens para os temas etc.
+### Comandos
 
-- lib/
-	Pasta de biblioteca com os arquivos .hpp e definições de classes, eu faço dessa forma pra não precisar me preocupar com a ordem em que as funções são definidas.
+* `PING` - Testa a conexão
+* `HELP` - Lista os comandos disponíveis
+* `STATE` - Retorna o estado atual do jogo
+* `BOARD` - Retorna o tabuleiro atual
+* `REVEAL x,y` - Revela a carta na posição (x,y) do tabuleiro (coordenadas de 0 a 3)
+* `RESET` - Reinicia o jogo (Novo em relação a implementação.)
+* `QUIT` - Desconecta o cliente
 
-- src/
-	Todos os arquivos .cpp necessários pra rodar o jogo.
+### Exemplo de Comandos
 
-- feeder.py
-	Usa uma biblioteca para baixar imagens da internet.
+```
+REVEAL 1,2
+STATE
+BOARD
+```
 
+### Exemplo de Respostas
+
+```
+REVEAL_OK 6 CACHORRO
+MATCH 6 14 CACHORRO Score: 2 x 1
+MISMATCH 2 5 Próximo: Jogador2
+GAME_OVER Vencedor: Jogador1 (5 pontos)
+```
+
+## IP e Porta Utilizados
+
+* **IP**: `localhost` (127.0.0.1)
+* **Porta**: `9003`
+
+## Sessões de Teste
+
+### Sessão entre dois jogadores
+
+```
+Jogador1: REVEAL 0,0
+Servidor: REVEAL_OK 0 CASA
+Jogador1: REVEAL 1,0
+Servidor: MATCH 0 1 CASA Score: 1 x 0
+
+Jogador1: REVEAL 2,0
+Servidor: REVEAL_OK 2 MESA
+Jogador1: REVEAL 3,0
+Servidor: MISMATCH 2 3 Próximo: Jogador2
+
+Jogador2: REVEAL 1,1
+...
+```
+
+### Sessão de teste com terminal
+
+```
+wscat -c ws://localhost:9003
+> HELP
+< Comandos disponíveis: PING, HELP, STATE, BOARD, REVEAL x,y, RESET, QUIT
+> REVEAL 2,2
+< REVEAL_OK 10 LIVRO
+```
+
+## Funcionalidades Implementadas
+
+* Tabuleiro 4x4 com pares de palavras embaralhadas
+* Dois jogadores conectados via WebSocket
+* Controle de turnos e pontuação
+* Respostas automáticas do servidor com atualizações para todos os clientes
+* Reinício de partida
+* Reconhecimento de fim de jogo com declaração de vencedor
+
+
+
+Feito com carinho para o professor Eduardo Habib Miranda! 

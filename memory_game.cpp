@@ -262,7 +262,7 @@ void on_close(server* s, websocketpp::connection_hdl hdl) {
 }
 
 int main() {
-    cout << "🎮 Servidor do Jogo da Memória" << endl;
+    cout << "Servidor do Jogo da Memória do Eduardo Miranda Habib" << endl;
     cout << "==============================" << endl;
 
     ws_server.set_access_channels(websocketpp::log::alevel::none);
@@ -277,10 +277,10 @@ int main() {
         ws_server.listen(9003);
         ws_server.start_accept();
 
-        cout << "✅ Servidor iniciado na porta 9003" << endl;
-        cout << "🌐 Conecte via: wscat -c ws://localhost:9003" << endl;
-        cout << "📋 Comandos: PING, HELP, STATE, BOARD, REVEAL x,y, RESET, QUIT" << endl;
-        cout << "🎯 Grid: coordenadas de 0 a 3 (ex: REVEAL 1,2)" << endl;
+        cout << "Servidor iniciado na porta 9003" << endl;
+        cout << "Conecte via: wscat -c ws://localhost:9003" << endl;
+        cout << "Comandos: PING, HELP, STATE, BOARD, REVEAL x,y, RESET, QUIT" << endl;
+        cout << "Grid: coordenadas de 0 a 3 (ex: REVEAL 1,2)" << endl;
 
         ws_server.run();
     } catch (const websocketpp::exception& e) {
